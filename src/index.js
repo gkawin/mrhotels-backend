@@ -1,39 +1,31 @@
+import * as Database from './database'
 
-import Promise from 'bluebird'
-import BodyParser from 'body-parser'
-import Cors from 'cors'
+import bodyParser from 'body-parser'
+import cors from 'cors'
 import Morgan from 'morgan'
 import Express from 'express'
 import Helmet from 'helmet'
-import fs from 'fs'
-import dotenv from 'dotenv'
 
-import r from 'rethinkdb'
+import './bootstrap'
 
-loadConfig('.env')
+const app = Express()
 
-function loadConfig (path) {
-  if (fs.existsSync(path)) {
-    console.log('(Loading configuration from ' + path + ')')
-    dotenv.config({ path })
-  } else {
-    console.log('(Not loading configuration from ' + path + ')')
-  }
-}
+// init
+app.use(cors())
+app.use(bodyParser.urlencoded({ extended: true }))
 
-// DB CONNECT
+// db
+app.use(Database.createConnection)
+app.route('/api/v1/auth').post(auth).get(auth)
+app.route('api/v1/users').post(auth)
+app.use(Database.closeConnection)
 
-const connectToDriver = Promise.coroutine(function * () {
-  const connection = yield r.connect({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    db: process.env.DB_NAME
-  })
-  try {
-    yield r.tableCreate(`users`).run(connection)
-  } catch (e) {
-    console.log(e.message)
-  }
+app.listen(2100, () => {
+  console.log('server is running.')
 })
 
-connectToDriver()
+function auth (req, res, next) {
+  console.log(req._dbConnect)
+  res.send('hello this is auth login JWT')
+  next()
+}
