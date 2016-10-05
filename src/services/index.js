@@ -1,10 +1,17 @@
 
-export const authentication = (req, res, next) => {
-  res.json({ message: 'authentication' })
+import r from 'rethinkdb'
+
+export const authentication = async (req, res, next) => {
+  const connection = req._dbConnect
+  const email = req.body.email
+  const result = await r.table('users').filter(r.row('email').eq(email)).run(connection)
+  const allAsArray = await result.toArray()
+  await res.json(allAsArray)
   next()
 }
 
-export const createUser = (req, res, next) => {
+export const createUser = async (req, res, next) => {
+  await res.json({ message: 'create' })
   next()
 }
 

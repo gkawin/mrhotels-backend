@@ -13,7 +13,9 @@ import './bootstrap'
 const app = Express()
 
 // init
+app.use(Database.createConnection)
 app.use(cors())
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(morgan('dev'))
 app.use(helmet())
@@ -21,8 +23,7 @@ app.use(Middlewares.jwt)
 app.use(Middlewares.jwtHandleError)
 
 // db
-app.use(Database.createConnection)
-app.route('/api/v1/auth').get(Services.authentication)
+app.route('/api/v1/auth').post(Services.authentication)
 app.route('/api/v1/users/createuser').post(Services.createUser)
 app.route('/api/v1/users/:userid').get(Services.getUserById)
 app.route('/api/v1/users/updateuser/:userid').put(Services.updateUserById)
