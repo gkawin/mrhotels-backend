@@ -1,12 +1,22 @@
 
 import r from 'rethinkdb'
+import jwt from 'jsonwebtoken'
 
 export const authentication = async (req, res, next) => {
   const connection = req._dbConnect
   const email = req.body.email
   const result = await r.table('users').filter(r.row('email').eq(email)).run(connection)
-  const allAsArray = await result.toArray()
-  await res.json(allAsArray)
+  const user = await result.toArray()
+  if (user.length === 0) res.json({ success: false, message: 'unauthorise' })
+
+  // jwt token
+  const token = jwt.sign(user[0], 'mrhotels_secret_key', {
+    expiresIn: '1h'
+  })
+  res.json({
+    success: true,
+    token
+  })
   next()
 }
 

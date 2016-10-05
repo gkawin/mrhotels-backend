@@ -7,6 +7,7 @@ import cors from 'cors'
 import morgan from 'morgan'
 import Express from 'express'
 import helmet from 'helmet'
+import compression from 'compression'
 
 import './bootstrap'
 
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(morgan('dev'))
 app.use(helmet())
+app.use(compression())
 app.use(Middlewares.jwt)
 app.use(Middlewares.jwtHandleError)
 
