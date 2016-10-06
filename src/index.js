@@ -1,5 +1,4 @@
 import * as Database from './database'
-import * as Services from './services'
 import * as Middlewares from './middlewares'
 
 import bodyParser from 'body-parser'
@@ -8,6 +7,8 @@ import morgan from 'morgan'
 import Express from 'express'
 import helmet from 'helmet'
 import compression from 'compression'
+
+import routes from './routes'
 
 import './bootstrap'
 
@@ -23,15 +24,7 @@ app.use(helmet())
 app.use(compression())
 app.use(Middlewares.jwt)
 app.use(Middlewares.jwtHandleError)
-
-// db
-app.route('/api/v1/auth').post(Services.authentication)
-app.route('/api/v1/users/createuser').post(Services.createUser)
-app.route('/api/v1/users/:userid').get(Services.getUserById)
-app.route('/api/v1/users/updateuser/:userid').put(Services.updateUserById)
-app.route('/api/v1/users/updateusersetting/:userid').patch(Services.updateUserSettingsById)
-app.route('/api/v1/users/deleteuser/:userid').delete(Services.deleteUserById)
-app.route('/users/:userid/logs').get(Services.getActivitiesLogs)
+app.use('/api/v1/', routes)
 app.use(Database.closeConnection)
 
 app.listen(2100, () => {
