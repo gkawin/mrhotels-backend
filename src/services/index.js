@@ -49,3 +49,10 @@ export const deleteUserById = (req, res, next) => {
 export const getActivitiesLogs = (req, res, next) => {
   next()
 }
+
+export const notFound = (req, res, next) => {
+  next({
+    status: 404,
+    message: 'Not Found'
+  })
+}

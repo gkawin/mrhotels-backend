@@ -20,14 +20,12 @@ app.use(morgan('dev'))
 app.use(helmet())
 app.use(compression())
 app.use('/api/v1/', routes)
+app.all('*', (req, res, next) => next({ code: 404, message: 'Not Found' }))
 
 app.use((err, req, res, next) => {
-  const errorCode = err.code || 500
-  const errorMessage = err.message
-  res.status(errorCode).json({
-    errorCode,
-    errorMessage
-  })
+  const code = err.code || 500
+  const message = err.message
+  res.status(code).json({ code, message })
 })
 
 app.listen(2100, () => {
