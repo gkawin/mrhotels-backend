@@ -1,15 +1,28 @@
 
-import r from 'rethinkdb'
+import rdb from 'rethinkdb'
 
-export const createConnection = (app) => async (req, res, next) => {
-  const conn = await r.connect({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    db: process.env.DB_NAME
-  })
-  app.set('dbConnect', conn)
+const createConnection = async () => rdb.connect({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  db: 'mh_login'
+})
+
+const closeConnection = (connection) => (
+  (connection)
+    ? connection.close()
+    : null
+)
+
+export const findAll = async (tableName) => {
+  const connection = await createConnection()
+  const result = await rdb.table(tableName).run(connection)
+  closeConnection(connection)
+  return await result.toArray()
 }
 
-export const closeConnection = async (req, res, next) => {
-  req._dbConnect.close()
+export const findById = async (tableName, id) => {
+  const connection = await createConnection()
+  const result = await rdb.table(tableName).get(id).run(connection)
+  closeConnection(connection)
+  return await result.toArray()
 }

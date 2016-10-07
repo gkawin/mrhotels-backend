@@ -1,27 +1,24 @@
-import { badRequest } from '../lib/errorHandler'
+import * as db from '../database'
+import { badRequest, boom } from '../lib/errorHandler'
 
-import r from 'rethinkdb'
 import jwt from 'jsonwebtoken'
 import _ from 'lodash'
 import bcrypt from 'bcrypt'
 
 export const authentication = async (req, res, next) => {
-  // const connection = app.get('dbConnect')
-  // const email = _.get(req, 'body.email', null)
-  // const password = _.get(req, 'body.password', null)
-  // const result = await r.table('users').filter(r.row('email').eq(email)).run(connection)
-  // const user = await result.toArray()
-  // if (user.length === 0) res.json({ success: false, message: 'unauthorise' })
-  //
-  // // jwt token
-  // const token = jwt.sign(_.first(user), 'mrhotels_secret_key', {
-  //   expiresIn: '1h'
-  // })
-  // res.json({
-  //   success: true,
-  //   token
-  // })
   if (_.isEmpty(req.body)) next(badRequest())
+  try {
+    const users = await db.findAll('users')
+    const token = jwt.sign(_.first(users), 'mrhotels_secret_key', {
+      expiresIn: '1h'
+    })
+    res.json({
+      token,
+      response_time: new Date()
+    })
+  } catch (e) {
+    next(boom(e.message))
+  }
   res.json({ success: true })
 }
 
