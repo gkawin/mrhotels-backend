@@ -1,23 +1,25 @@
+import * as db from '../database'
+import { badRequest, boom } from '../lib/errorHandler'
 
-import r from 'rethinkdb'
 import jwt from 'jsonwebtoken'
+import _ from 'lodash'
+import bcrypt from 'bcrypt'
 
 export const authentication = async (req, res, next) => {
-  const connection = req._dbConnect
-  const email = req.body.email
-  const result = await r.table('users').filter(r.row('email').eq(email)).run(connection)
-  const user = await result.toArray()
-  if (user.length === 0) res.json({ success: false, message: 'unauthorise' })
-
-  // jwt token
-  const token = jwt.sign(user[0], 'mrhotels_secret_key', {
-    expiresIn: '1h'
-  })
-  res.json({
-    success: true,
-    token
-  })
-  next()
+  if (_.isEmpty(req.body)) next(badRequest())
+  try {
+    const users = await db.findAll('users')
+    const token = jwt.sign(_.first(users), 'mrhotels_secret_key', {
+      expiresIn: '1h'
+    })
+    res.json({
+      token,
+      response_time: new Date()
+    })
+  } catch (e) {
+    next(boom(e.message))
+  }
+  res.json({ success: true })
 }
 
 export const createUser = async (req, res, next) => {
@@ -44,4 +46,11 @@ export const deleteUserById = (req, res, next) => {
 
 export const getActivitiesLogs = (req, res, next) => {
   next()
+}
+
+export const notFound = (req, res, next) => {
+  next({
+    status: 404,
+    message: 'Not Found'
+  })
 }
