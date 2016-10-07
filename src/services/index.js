@@ -1,3 +1,4 @@
+import { badRequest } from '../lib/errorHandler'
 
 import r from 'rethinkdb'
 import jwt from 'jsonwebtoken'
@@ -20,7 +21,7 @@ export const authentication = async (req, res, next) => {
   //   success: true,
   //   token
   // })
-  if (!req.body.email) next(new Error('fail'))
+  if (_.isEmpty(req.body)) next(badRequest())
   res.json({ success: true })
 }
 
