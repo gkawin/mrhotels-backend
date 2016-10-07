@@ -1,11 +1,15 @@
 
 import r from 'rethinkdb'
 
-export const find = async (tableName, id, connection) => (
-  await r.table(tableName).get(id).run(connection)
-)
+const connection = r.connect({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  db: process.env.DB_NAME
+})
+.then((connection) => {
+  module.exports.findAll = (tableName) => (
+    r.table(tableName).run(connection).then((result) => result.toArray())
+  )
+})
 
-export const findAll = async (tableName, connection) => {
-  const resultSet = await r.table(tableName).run(connection)
-  return await resultSet.toArray()
-}
+module.exports = connection

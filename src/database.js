@@ -8,7 +8,6 @@ export const createConnection = (app) => async (req, res, next) => {
     db: process.env.DB_NAME
   })
   app.set('dbConnect', conn)
-  next()
 }
 
 export const closeConnection = async (req, res, next) => {

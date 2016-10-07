@@ -1,5 +1,3 @@
-import * as Database from './database'
-import * as Middlewares from './middlewares'
 
 import bodyParser from 'body-parser'
 import cors from 'cors'
@@ -15,22 +13,21 @@ import './bootstrap'
 const app = Express()
 
 // init
-app.use(Database.createConnection(app))
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(morgan('dev'))
 app.use(helmet())
 app.use(compression())
-app.use(Middlewares.jwt)
-app.use(Middlewares.jwtHandleError)
-app.use('/api/v1/', routes(app))
-app.use(Database.closeConnection)
+app.use('/api/v1/', routes)
 
-// error handlers
 app.use((err, req, res, next) => {
-  res.status(err.status || 500)
-  res.json({ error: err.message })
+  const errorCode = err.code || 500
+  const errorMessage = err.message
+  res.status(errorCode).json({
+    errorCode,
+    errorMessage
+  })
 })
 
 app.listen(2100, () => {
