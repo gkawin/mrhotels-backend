@@ -29,6 +29,7 @@
     "express-jwt": "^5.1.0",
     "express-unless": "^0.3.0",
     "helmet": "^2.3.0",
+    "joi": "^9.1.0",
     "jsonwebtoken": "^7.1.9",
     "lodash": "^4.16.2",
     "moment": "^2.15.1",

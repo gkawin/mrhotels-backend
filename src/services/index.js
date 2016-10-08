@@ -4,11 +4,19 @@ import { badRequest, boom } from '../lib/errorHandler'
 import jwt from 'jsonwebtoken'
 import _ from 'lodash'
 import bcrypt from 'bcrypt'
+import Joi from 'joi'
 
 export const authentication = async (req, res, next) => {
-  if (_.isEmpty(req.body)) next(badRequest())
   try {
-    const users = await db.findAll('users')
+    const schema = Joi.object().keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required()
+    })
+    Joi.validate(req.body, schema, (err) => {
+      if (err) next(badRequest(err.message))
+    })
+    const email = req.body.email
+    const users = await db.findBy('users', 'email', email)
     const token = jwt.sign(_.first(users), 'mrhotels_secret_key', {
       expiresIn: '1h'
     })
@@ -17,9 +25,9 @@ export const authentication = async (req, res, next) => {
       response_time: new Date()
     })
   } catch (e) {
+    // specially for internal error
     next(boom(e.message))
   }
-  res.json({ success: true })
 }
 
 export const createUser = async (req, res, next) => {
@@ -46,11 +54,4 @@ export const deleteUserById = (req, res, next) => {
 
 export const getActivitiesLogs = (req, res, next) => {
   next()
-}
-
-export const notFound = (req, res, next) => {
-  next({
-    status: 404,
-    message: 'Not Found'
-  })
 }
