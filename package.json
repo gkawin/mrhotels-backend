@@ -33,8 +33,8 @@
     "jsonwebtoken": "^7.1.9",
     "lodash": "^4.16.2",
     "moment": "^2.15.1",
+    "mongoose": "^4.6.3",
     "morgan": "^1.7.0",
-    "rethinkdb": "^2.3.3",
     "updeep": "^0.16.1"
   },
   "devDependencies": {

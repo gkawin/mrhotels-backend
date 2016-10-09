@@ -1,5 +1,9 @@
 import fs from 'fs'
 import dotenv from 'dotenv'
+import { connect as dbConnect } from 'mongoose'
+
+loadConfig('.env')
+dbConnect('mongodb://localhost/mh_login')
 
 const loadConfig = (path) => {
   if (fs.existsSync(path)) {
@@ -9,5 +13,3 @@ const loadConfig = (path) => {
     console.log('(Not loading configuration from ' + path + ')')
   }
 }
-
-loadConfig('.env')
