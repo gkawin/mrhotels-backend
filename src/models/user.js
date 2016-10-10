@@ -1,4 +1,6 @@
-import { Schema, modal } from 'mongoose'
+import mongoose from 'mongoose'
+
+const Schema = mongoose.Schema
 
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
@@ -10,4 +12,4 @@ const userSchema = new Schema({
   last_name: String
 })
 
-export default modal('user', userSchema)
+export default mongoose.model('users', userSchema)

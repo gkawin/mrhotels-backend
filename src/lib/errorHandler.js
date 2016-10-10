@@ -4,6 +4,11 @@ export const badRequest = (message = '') => {
   return { code: 400, message: msg }
 }
 
+export const unauthorized = (message = '') => {
+  const msg = !message ? 'Unauthorized' : message
+  return { code: 401, message: msg }
+}
+
 export const notFound = (message = '') => {
   const msg = !message ? 'Not Found' : message
   return { code: 404, message: msg }

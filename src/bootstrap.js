@@ -1,9 +1,6 @@
 import fs from 'fs'
 import dotenv from 'dotenv'
-import { connect as dbConnect } from 'mongoose'
-
-loadConfig('.env')
-dbConnect('mongodb://localhost/mh_login')
+import mongoose from 'mongoose'
 
 const loadConfig = (path) => {
   if (fs.existsSync(path)) {
@@ -13,3 +10,7 @@ const loadConfig = (path) => {
     console.log('(Not loading configuration from ' + path + ')')
   }
 }
+
+loadConfig('.env')
+mongoose.connect('mongodb://localhost/mh_login')
+mongoose.Promise = require('bluebird')
