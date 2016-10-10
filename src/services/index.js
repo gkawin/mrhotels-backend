@@ -3,30 +3,29 @@ import jwt from 'jsonwebtoken'
 import _ from 'lodash'
 import bcrypt from 'bcrypt'
 import Joi from 'joi'
+import Boom from 'boom'
 
 import UserModal from '../models/user'
-import { badRequest, boom, unauthorized } from '../lib/errorHandler'
 
 export const authentication = async (req, res, next) => {
-  const schema = Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required()
-  })
-  Joi.validate(req.body, schema, (err) => {
-    if (err) next(badRequest(err.message))
-  })
   try {
+    const schema = Joi.object().keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required()
+    })
+
+    const errMessage = await Joi.validate(req.body, schema, (err) => err.message)
+    if (errMessage) throw Boom.badRequest(errMessage)
     const email = req.body.email
-    UserModal.findOne({ email: email }).then((result) => {
-      if (_.isEmpty(result)) next(unauthorized())
-      const token = jwt.sign(result, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
-      res.json({
-        token,
-        response_time: new Date()
-      })
+    const user = await UserModal.findOne({ email: email })
+
+    const token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
+    res.json({
+      token,
+      response_time: new Date()
     })
   } catch (e) {
-    next(boom(e.message))
+    next(e)
   }
 }
 

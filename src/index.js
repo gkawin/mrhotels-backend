@@ -24,9 +24,9 @@ app.use('/api/v1/', routes)
 app.all('*', (req, res, next) => next(notFound()))
 
 app.use((err, req, res, next) => {
-  const code = err.code || 500
-  const message = err.message
-  res.status(code).json({ code, message })
+  const boomPayload = err.output.payload
+  const code = boomPayload.statusCode || 500
+  res.status(code).json(boomPayload)
 })
 
 app.listen(2100, () => {
