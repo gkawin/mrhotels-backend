@@ -17,12 +17,13 @@ export const authentication = async (req, res, next) => {
   })
   try {
     const email = req.body.email
-    const users = await UserModal.findOne({ email: email })
-    if (_.isEmpty(users)) next(unauthorized())
-    const token = jwt.sign(users, 'mrhotels_secret_key', { expiresIn: '1h' })
-    res.json({
-      token,
-      response_time: new Date()
+    UserModal.findOne({ email: email }).then((result) => {
+      if (_.isEmpty(result)) next(unauthorized())
+      const token = jwt.sign(result, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
+      res.json({
+        token,
+        response_time: new Date()
+      })
     })
   } catch (e) {
     next(boom(e.message))
