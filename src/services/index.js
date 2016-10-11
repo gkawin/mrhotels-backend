@@ -18,8 +18,13 @@ export const authentication = async (req, res, next) => {
     if (errMessage) throw Boom.badRequest(errMessage)
 
     const email = req.body.email
+    const plainPassword = req.body.password
     const user = await UserModal.findOne({ email: email })
     if (!user) throw Boom.unauthorized()
+
+    const hashed_password = user.hashed_password
+    const isValidated = bcrypt.compareSync(plainPassword, hashed_password)
+    if (!isValidated) throw Boom.unauthorized()
 
     const token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
     res.json({
