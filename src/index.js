@@ -5,8 +5,8 @@ import morgan from 'morgan'
 import Express from 'express'
 import helmet from 'helmet'
 import compression from 'compression'
+import Boom from 'boom'
 
-import { notFound } from './lib/errorHandler'
 import routes from './routes'
 
 import './bootstrap'
@@ -21,7 +21,7 @@ app.use(morgan('dev'))
 app.use(helmet())
 app.use(compression())
 app.use('/api/v1/', routes)
-app.all('*', (req, res, next) => next(notFound()))
+app.all('*', (req, res, next) => next(Boom.notFound()))
 
 app.use((err, req, res, next) => {
   const boomPayload = err.output.payload
