@@ -1,10 +1,11 @@
-import * as db from '../database'
-import { badRequest, boom } from '../lib/errorHandler'
 
 import jwt from 'jsonwebtoken'
 import _ from 'lodash'
 import bcrypt from 'bcrypt'
 import Joi from 'joi'
+import Boom from 'boom'
+
+import UserModal from '../models/user'
 
 export const authentication = async (req, res, next) => {
   try {
@@ -12,21 +13,21 @@ export const authentication = async (req, res, next) => {
       email: Joi.string().email().required(),
       password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required()
     })
-    Joi.validate(req.body, schema, (err) => {
-      if (err) next(badRequest(err.message))
-    })
+
+    const errMessage = await Joi.validate(req.body, schema, (err) => err)
+    if (errMessage) throw Boom.badRequest(errMessage)
+
     const email = req.body.email
-    const users = await db.findBy('users', 'email', email)
-    const token = jwt.sign(_.first(users), 'mrhotels_secret_key', {
-      expiresIn: '1h'
-    })
+    const user = await UserModal.findOne({ email: email })
+    if (!user) throw Boom.unauthorized()
+
+    const token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
     res.json({
       token,
       response_time: new Date()
     })
   } catch (e) {
-    // specially for internal error
-    next(boom(e.message))
+    next(e)
   }
 }
 

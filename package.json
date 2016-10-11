@@ -22,6 +22,7 @@
     "bcrypt": "^0.8.7",
     "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
+    "boom": "^4.1.0",
     "compression": "^1.6.2",
     "cors": "^2.8.1",
     "dotenv": "^2.0.0",
@@ -33,8 +34,8 @@
     "jsonwebtoken": "^7.1.9",
     "lodash": "^4.16.2",
     "moment": "^2.15.1",
+    "mongoose": "^4.6.3",
     "morgan": "^1.7.0",
-    "rethinkdb": "^2.3.3",
     "updeep": "^0.16.1"
   },
   "devDependencies": {
