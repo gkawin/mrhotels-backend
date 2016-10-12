@@ -1,9 +1,9 @@
 
 import jwt from 'jsonwebtoken'
-import _ from 'lodash'
 import bcrypt from 'bcrypt'
 import Joi from 'joi'
 import Boom from 'boom'
+import _ from 'lodash'
 
 import UserModal from '../models/user'
 
@@ -19,14 +19,14 @@ export const authentication = async (req, res, next) => {
 
     const email = req.body.email
     const plainPassword = req.body.password
-    const user = await UserModal.findOne({ email: email })
+    const user = await UserModal.findOne({ email: email }).lean()
     if (!user) throw Boom.unauthorized()
 
     const hashed_password = user.hashed_password
     const isValidated = bcrypt.compareSync(plainPassword, hashed_password)
     if (!isValidated) throw Boom.unauthorized()
 
-    const token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
+    const token = jwt.sign(_.omit(user, [ 'hashed_password', 'salt' ]), process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
     res.json({
       token,
       response_time: new Date()
@@ -37,8 +37,7 @@ export const authentication = async (req, res, next) => {
 }
 
 export const createUser = async (req, res, next) => {
-  await res.json({ message: 'create' })
-  next()
+  res.json({ message: 'create' })
 }
 
 export const getUserById = (req, res, next) => {
