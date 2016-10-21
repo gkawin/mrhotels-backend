@@ -12,5 +12,5 @@ const loadConfig = (path) => {
 }
 
 loadConfig('.env')
-mongoose.connect('mongodb://localhost/mh_login')
 mongoose.Promise = require('bluebird')
+mongoose.connect('mongodb://localhost/mh_login')

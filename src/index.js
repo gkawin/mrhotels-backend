@@ -1,13 +1,16 @@
 
+import Express from 'express'
+import Boom from 'boom'
+
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import morgan from 'morgan'
-import Express from 'express'
 import helmet from 'helmet'
 import compression from 'compression'
-import Boom from 'boom'
+import expressjwt from 'express-jwt'
 
 import routes from './routes'
+import errorHandlers from './errorHandlers'
 
 import './bootstrap'
 
@@ -20,14 +23,11 @@ app.use(bodyParser.json())
 app.use(morgan('dev'))
 app.use(helmet())
 app.use(compression())
+app.use(expressjwt({ secret: process.env.JWT_SECRET_KEY, credentialsRequired: false }).unless({ path: [ '/api/v1/auth' ] }))
+
 app.use('/api/v1/', routes)
 app.all('*', (req, res, next) => next(Boom.notFound()))
-
-app.use((err, req, res, next) => {
-  const boomPayload = err.output.payload
-  const code = boomPayload.statusCode || 500
-  res.status(code).json(boomPayload)
-})
+app.use(errorHandlers)
 
 app.listen(2100, () => {
   console.log('server is running.')
